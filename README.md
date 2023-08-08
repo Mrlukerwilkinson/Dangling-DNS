@@ -1,6 +1,6 @@
 <h2>DRAFT - Work in Progress!!!!! Avoid subdomain takeover – find and cut your Dangling DNS entries!!</h2>
 <br>
-This post describes a common threat of subdomain hijacking, also known as subdomain takeover, and provides some steps you can take to mitigate it. The following post is for Security Engineers / Administrators that manage public Azure DNS Zones in a Cloud Environment that uses multiple Azure Services, including Azure App Services. The following process is focused on Azure Services, however can be used for any other service so, change and fit the requirements for your needs.
+This post describes a common threat of subdomain hijacking, also known as subdomain takeover, and provides some steps you can take to mitigate it. The following post is for Security Engineers / Administrators that manage public Azure DNS Zones in a cloud environment that uses multiple Azure Services, including Azure App Services. The following process is focused on Azure Services, however, it can be used for any other service, so change and fit the requirements for your needs.
 
 <h2>🕵️‍♂️🌐 What is subdomain hijacking? </h2>
 <p>
@@ -8,7 +8,7 @@ Subdomain hijacking is not new and is an increasingly common vulnerability due t
 </p>
 
 <p>
-Subdomain hijacking occurs when a DNS record - typically a CNAME record (for the sake of this post), points to a service that has been de-provisioned, and the DNS record pointing to the service is still active. The domain that the DNS record points to becomes available, and attackers can take ownership of this domain and then publish malicious content. This may be a common vulnerability if your organisation uses Azure App Service or Elastic Beanstalk and the service is not de-provisioned properly at the end of its lifecycle. 
+Subdomain hijacking occurs when a DNS record - typically a CNAME record (for the sake of this post), points to a service that has been de-provisioned, and the DNS record pointing to the service is still active - also called dangling DNS entries. The domain that the DNS record points to becomes available, and attackers can take ownership of this domain and then publish malicious content. This may be a common vulnerability if your organisation uses Azure App Service or Elastic Beanstalk and the service is not de-provisioned properly at the end of its lifecycle. 
 </p>
 <p>
 This post focuses on Microsoft Azure services. For additional background, you can find further explanations from Microsoft’s article on <a href="https://learn.microsoft.com/en-us/azure/security/fundamentals/subdomain-takeover">how to prevent dangling DNS entries and avoid subdomain takeover.</a>
@@ -16,13 +16,13 @@ This post focuses on Microsoft Azure services. For additional background, you ca
 
 <h2>🔒🔓🛡️💻🔥 Attack Scenario </h2>
 <ol>
-<li>Your company spins up an Azure APP service as a TEST/UAT/PROD environment.</li>
-<li>Your company creates a CNAME record to point to the new app service.</li>
+<li>Your company spins up an Azure App Service for a TEST/UAT/PROD environment.</li>
+<li>Your company creates a CNAME record to point to the new App Service.</li>
 <li>Your company completes testing and deletes the App Service but does not delete the CNAME record pointing to the App Service’s unique URL. </li>
-<li>An attacker signs up for an Azure App Service and claims your company's previous domain. <Add example app service > As the DNS records already exist in your company’s public DNS, your domain now points to the attacker’s-controlled environment.</li>
-<li>The attacker can now host any content, and your company's domain is now potentially serving up malicious or reputationally damaging content</li>
+<li>An attacker spins up an Azure App Service and claims your company's previous domain. As the DNS records already exist in your company’s public DNS, your domain now points to the attacker’s-controlled environment.</li>
+<li>The attacker can now host any content, and your company's domain is now potentially serving up malicious or reputationally damaging content.</li>
 <li>Your company's Cyber Threat Team alerts you to the attack - if you're fortunate enough to have one!</li>
-<li>You read this and other articles on how to prevent future attacks</li>
+<li>You read this and other articles to understand what happened and how to prevent future attacks.</li>
 </ol>
 
   
@@ -52,7 +52,7 @@ The script should search through your Azure DNS Zones and locate any DNS Records
 <h2>✅📝✅ Check DNS Records for Dangling DNS entries</h2>
 Now we have a list of DNS records from the environment that contain the known Microsoft Azure domains used in common services such as App Service, it's time to perform a lookup of the domain(s) to determine if the domain exists in DNS.
 
-To make this step easier and automate the process, we will grab the values from the CSV file created earlier, in particular, the domain's value. Export this list to a TXT file, with each domain on a separate line, and then update the input_file value in the below script with your file name. 
+To make this step easier and automate the process, we will grab the values from the CSV file created earlier, in particular, the domain's value. Export this list to a TXT file, with each domain on a separate line, and then update the input_file value in the below script with your file name / location. 
 
 The script below performs a <a href="https://linux.die.net/man/1/dig">dig</a> lookup on all domains listed in the TXT file, then reviews the header section of the output for the status field, then exports the domain and status to a CSV file for review. The common status values that you might encounter include:
 <ol>
@@ -73,8 +73,10 @@ These status values provide information about the outcome of the DNS query and h
 <br>
 
 <b>check_domain_status.sh</b>
+</p>
 
-````#!/bin/bash
+````
+#!/bin/bash
 
 # Populate a txt file of domains you want to check - each domain should be on a separate line
 input_file="domain_list.txt"
@@ -108,5 +110,12 @@ while IFS= read -r domain || [[ -n "$domain" ]]; do
     
     # Display the result on the screen
     echo "$domain: $status"
-done < "$input_file"````
-</p>
+done < "$input_file"
+````
+
+<h2>🎉🏁🎉Conclusion🎉🏁🎉</h2>
+
+After obtaining a list of DNS records in your environment that are potentially vulnerable to a domain takeover attack, and then performing a status check on each domain, you should hopefully now be able to identify what records are no longer resolving and can be removed from your public DNS to mitigate any risk associated with a potential domain takeover attack. 
+
+This post focused on Azure services and Azure DNS, however, this process can be adapted and modified to suit your specific needs so feel free to copy and improve the process as you see fit! 
+
