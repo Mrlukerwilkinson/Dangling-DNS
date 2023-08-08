@@ -28,7 +28,24 @@ Connect-AzAccount
 # Define the subscription ID and resource group name
 $subscriptionId = "subscriptionID"
 $resourceGroupName = "resourceGroupName"
-$keywords = @("keyword1", "example.com", "anotherkeyword.com")
+$keywords = @(
+            "cloudapp.net", 
+            "cloudapp.azure.com", 
+            "azurewebsites.net", 
+            "blob.core.windows.net", 
+            "cloudapp.azure.com", 
+            "azure-api.net", 
+            "azurehdinsight.net", 
+            "azureedge.net", 
+            "azurecontainer.io",
+            "database.windows.net",
+            "azuredatalakestore.net",
+            "search.windows.net",
+            "azurecr.io",
+            "redis.cache.windows.net",
+            "azurehdinsight.net",
+            "servicebus.windows.net",
+            "visualstudio.com")
 
 # Get the DNS zones in the resource group
 $dnsZones = Get-AzDnsZone -ResourceGroupName $resourceGroupName
