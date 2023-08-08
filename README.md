@@ -50,9 +50,9 @@ Download and run the script <a href="https://github.com/Mrlukerwilkinson/Danglin
 The script should search through your Azure DNS Zones and locate any DNS Records that contain the Microsoft Azure domains listed in Figure 1 above, and export the record name, type, value and DNS Zone to a CSV file for review. 
 <br>
 <h2>✅📝✅ Check DNS Records for Dangling DNS entries</h2>
-Now we have a list of DNS records from the environment that contain the known Microsoft Azure domains used in common services such as App Service, it's time to perform a lookup of the domain(s) to determine if the domain exists in DNS.
+Now we have a list of DNS records from the environment that contain the known Microsoft Azure domains used in common services such as App Service, it's time to perform a DNS lookup of the domain(s) to determine if the domain is actually resolvable.
 
-To make this step easier and automate the process, we will grab the values from the CSV file created earlier, in particular, the domain's value. Export this list to a TXT file, with each domain on a separate line, and then update the input_file value in the below script with your file name / location. 
+To make this step easier and automate the process, we will grab the values from the CSV file created earlier, in particular, the domain's value. Export this list to a TXT file, with each domain on a separate line, and then update the input_file value in the below script with your TXT file name / location. 
 
 The script below performs a <a href="https://linux.die.net/man/1/dig">dig</a> lookup on all domains listed in the TXT file, then reviews the header section of the output for the status field, then exports the domain and status to a CSV file for review. The common status values that you might encounter include:
 <ol>
