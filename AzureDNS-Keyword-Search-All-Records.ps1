@@ -1,10 +1,10 @@
 <#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AzureDNS-Keyword-Search-All-Records.ps1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Searches across all DNS Zones for specific records based on keywords
+Searches across all DNS Zones for specific records based on keyword
 Author: Luke Wilkinson
-Created: 8/08/2023
-Last Modified: 8/08/2023
+Created: 9/08/2023
+Last Modified: 9/08/2023
 Last Modified By: Luke Wilkinson 
 
 Script Function:
@@ -12,6 +12,7 @@ Script Function:
 2. Searches all DNS Zones contained within a specific resource group, looking for records that contain specific keywords in the value. 
 3. Exports the results to excel.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------#>
+
 
 # Install required modules if not already installed
 $modules = "Az.Accounts", "ImportExcel"
@@ -26,26 +27,12 @@ foreach ($module in $modules) {
 Connect-AzAccount
 
 # Define the subscription ID and resource group name
-$subscriptionId = "subscriptionID"
+$subscriptionId = "subscription"
 $resourceGroupName = "resourceGroupName"
-$keywords = @(
-            "cloudapp.net", 
-            "cloudapp.azure.com", 
-            "azurewebsites.net", 
-            "blob.core.windows.net", 
-            "cloudapp.azure.com", 
-            "azure-api.net", 
-            "azurehdinsight.net", 
-            "azureedge.net", 
-            "azurecontainer.io",
-            "database.windows.net",
-            "azuredatalakestore.net",
-            "search.windows.net",
-            "azurecr.io",
-            "redis.cache.windows.net",
-            "azurehdinsight.net",
-            "servicebus.windows.net",
-            "visualstudio.com")
+$keyword = "azurewebsites.net"
+
+# Set the desired subscription if requried
+# Set-AzContext -SubscriptionId $subscriptionId
 
 # Get the DNS zones in the resource group
 $dnsZones = Get-AzDnsZone -ResourceGroupName $resourceGroupName
@@ -57,9 +44,9 @@ $outputArray = @()
 foreach ($dnsZone in $dnsZones) {
     $dnsRecords = Get-AzDnsRecordSet -Zone $dnsZone
 
-    # Search for records with the keywords in their values
+    # Search for records with the keyword in their values
     $matchedRecords = $dnsRecords | Where-Object {
-        $_.Records | Where-Object { $keywords -contains $_ }
+        $_.Records | Where-Object { $_ -like "*$keyword*" }
     }
 
     if ($matchedRecords) {
@@ -95,11 +82,11 @@ foreach ($dnsZone in $dnsZones) {
 
 if ($outputArray) {
     # Export the matched DNS records to Excel
-    $outputPath = "C:\Location\to\export\export.xlsx"
+    $outputPath = "C:\Path\to\export\AzureDNS_Results.xlsx"
     $outputArray | Export-Excel -Path $outputPath -AutoSize -FreezeTopRow -AutoFilter
     Write-Output "Matched DNS records exported to: $outputPath"
 } else {
-    Write-Output "No DNS records matched the keywords in the specified resource group."
+    Write-Output "No DNS records matched the keyword in the specified resource group."
 }
 
 # Disconnect from Azure account
